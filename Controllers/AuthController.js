@@ -92,8 +92,30 @@ const Login = async(req,res) => {
 const RefreshToken = async(req,res) => {
     try{
 
+      const refreshToken = req.cookies;
+
+      if(!refreshToken){
+        return res.status(401).json({error:"Refresh Token not found !"})
+      }
+
+      const decoded = jwt.verify(refreshToken,process.env.REFRESH_SECRET_KEY);
+
+      const payLoad = {
+        username:decoded.username,
+        email:decoded.email,
+        role:decoded.role,
+        userId:decoded.userId
+      }
+
+      const accessToken = jwt.sign(payLoad,process.env.ACCESS_SECRET_KEY,{expiresIn:'2m'});
+
+      res.status(200).json({
+        message:"Token Verification Successful !",
+        token:accessToken
+      })
+
     }
     catch(err){
-
+       res.status(500).json({error:"Internal Server Error !"})
     }
 }
