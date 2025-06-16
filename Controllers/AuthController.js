@@ -73,6 +73,10 @@ const Login = async(req,res) => {
 
       const refreshToken = jwt.sign(payLoad,process.env.REFRESH_SECRET_KEY,{expiresIn:"7d"});
 
+      isExisting.refreshToken = refreshToken;
+
+      await isExisting.save();
+
       res.cookie('refreshToken',refreshToken,{
         httpOnly:true,
         sameSite:"strict",
@@ -92,10 +96,12 @@ const Login = async(req,res) => {
 const RefreshToken = async(req,res) => {
     try{
 
-      const refreshToken = req.cookies;
+      const {refreshToken} = req.cookies;
 
-      if(!refreshToken){
-        return res.status(401).json({error:"Refresh Token not found !"})
+      const user = await User.findOne({refreshToken});
+
+      if(!user){
+        return res.status(400).json({error:"Refresh token revoked !"})
       }
 
       const decoded = jwt.verify(refreshToken,process.env.REFRESH_SECRET_KEY);
@@ -117,5 +123,38 @@ const RefreshToken = async(req,res) => {
     }
     catch(err){
        res.status(500).json({error:"Internal Server Error !"})
+    }
+}
+
+const Logout = async(req,res) => {
+    try{
+    
+        const {refreshToken} = req.cookies;
+
+        if(!refreshToken){
+            return res.status(400).json({error:"No refresh token provided !"})
+        }
+
+        const user = await User.findOne({email});
+
+        // removal of refresh token from DB
+
+        if(user){
+            user.refreshToken = "";
+            await user.save();
+        }
+
+        // clear the cookie
+
+        res.clearCookie('refreshToken',{
+            httpOnly:true,
+            sameSite:'strict'
+        });
+
+        res.status(200).json({message:"Logout Successful !"})
+
+    }
+    catch(err){
+          res.status(500).json({error:"Internal Server Error !"})
     }
 }
