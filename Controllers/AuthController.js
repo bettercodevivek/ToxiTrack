@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const User = require('../Models/UserModel');
 
 const bcrypt = require('bcryptjs');
@@ -135,7 +137,7 @@ const Logout = async(req,res) => {
             return res.status(400).json({error:"No refresh token provided !"})
         }
 
-        const user = await User.findOne({email});
+        const user = await User.findOne({refreshToken});
 
         // removal of refresh token from DB
 
@@ -155,6 +157,7 @@ const Logout = async(req,res) => {
 
     }
     catch(err){
+          console.log("error is : ",err.message);
           res.status(500).json({error:"Internal Server Error !"})
     }
 }
