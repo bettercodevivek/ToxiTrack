@@ -54,3 +54,44 @@ PERSPECTIVE_API_KEY=your_perspective_api_key
 # Start the server
 npm start
 ```
+
+## 🧪 Testing the API (via Postman)
+
+### 🔐 Auth Routes
+
+| Method | Route                      | Description              |
+|--------|----------------------------|--------------------------|
+| POST   | `/api/auth/signup`         | Register a new user      |
+| POST   | `/api/auth/login`          | Login and get tokens     |
+| POST   | `/api/auth/verify-otp`     | Verify OTP via email     |
+| POST   | `/api/auth/refresh`        | Get new access token     |
+
+### 🔒 Protected Routes (Requires Access Token)
+
+> ⚠️ Add the following header for protected routes:
+
+Authorization: Bearer <your_access_token>
+
+
+### 🧾 Message Routes
+
+| Method | Route             | Description                  |
+|--------|-------------------|------------------------------|
+| GET    | `/api/messages`   | Fetch all chat messages      |
+| POST   | `/api/messages`   | Send and analyze new message |
+
+---
+
+## 🌐 WebSocket Integration
+
+Once the user is logged in and verified, they can connect to the WebSocket server at:
+
+
+### 🔄 Message Payload (Client → Server)
+
+```json
+{
+  "token": "JWT_ACCESS_TOKEN",
+  "message": "Hey, how are you?"
+}
+
